@@ -9,12 +9,17 @@ public class Player : MonoBehaviour
     [SerializeField]
     private GameObject _laserPrefab;
     [SerializeField]
+    private GameObject _enemyPrefab;
+    [SerializeField]
     private float _fireRate = 0.2f;
     private float _lastShotTime = 0;
+    [SerializeField]
+    private int Lives { get; set; }
 
     void Start()
     {
         transform.position = new Vector3(0, 0, 0);
+        this.Lives = 3;
     }
 
     void Update()
@@ -22,9 +27,17 @@ public class Player : MonoBehaviour
         CalculateMovement();
         if (Input.GetKeyDown(KeyCode.Space) && _lastShotTime + _fireRate < Time.time)
         {
+            // FOR TESTING
+            Instantiate(_enemyPrefab, new Vector3(Random.Range(-8.0f, 8.0f), 8), Quaternion.identity);
+            // END FOR TESTING
+
             FireWeapon();
         }
 
+        if (this.Lives <= 0)
+        {
+            Destroy(this.gameObject);
+        }
     }
 
     void FireWeapon()
@@ -51,5 +64,10 @@ public class Player : MonoBehaviour
         {
             transform.position = new Vector3(-(transform.position.x), transform.position.y, 0);
         }
+    }
+
+    public void DamagePlayer()
+    {
+        this.Lives--;
     }
 }
