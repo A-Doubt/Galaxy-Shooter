@@ -5,20 +5,39 @@ using UnityEngine;
 public class Player : MonoBehaviour
 {
     [SerializeField]
-    private float _speed = 2.5f;
-    [SerializeField]
-    private GameObject _laserPrefab;
+    private float _speed = 3.5f;
     [SerializeField]
     private float _fireRate = 0.2f;
-    private float _lastShotTime = 0;
     [SerializeField]
     private int _lives = 3;
+    private float _lastShotTime = 0;
+
     private SpawnManager _spawnManager;
+
+    [SerializeField]
+    private GameObject _shieldVisuals;
+
+    // prefabs
+    [SerializeField]
+    private GameObject _tripleShotPrefab;
+    [SerializeField]
+    private GameObject _laserPrefab;
+
+    // powerups
+    private bool _isTripleShot = false;
+    private bool _isBonusSpeed = false;
+    private bool _isShieldActive = false;
+
+
+    [SerializeField]
+    private float _bonusSpeed = 5.0f;
+    private float _powerupDuration = 3.0f;
 
     void Start()
     {
         transform.position = new Vector3(0, -2, 0);
         _spawnManager = GameObject.Find("Spawn_Manager").GetComponent<SpawnManager>();
+        _shieldVisuals.SetActive(false);
         if (_spawnManager == null)
         {
             Debug.LogError("Spawn manager is NULL.");
@@ -37,7 +56,11 @@ public class Player : MonoBehaviour
     void FireWeapon()
     {
         Vector3 offset = new Vector3(0, 0.9f);
-        Instantiate(_laserPrefab, transform.position + offset, Quaternion.identity);
+        if (_isTripleShot == true)
+        {
+            Instantiate(_tripleShotPrefab, transform.position, Quaternion.identity);
+        }
+        else Instantiate(_laserPrefab, transform.position + offset, Quaternion.identity);
         _lastShotTime = Time.time;
     }
 
@@ -47,7 +70,15 @@ public class Player : MonoBehaviour
         float verticalinput = Input.GetAxis("Vertical");
 
         Vector3 direction = new Vector3(horizontalInput, verticalinput, 0);
-        transform.Translate(direction * _speed * Time.deltaTime);
+
+        if (_isBonusSpeed == true)
+        {
+            transform.Translate(direction * (_speed + _bonusSpeed) * Time.deltaTime);
+        }
+        else
+        {
+            transform.Translate(direction * _speed * Time.deltaTime);
+        }
 
         transform.position = new Vector3(
             transform.position.x, 
@@ -62,12 +93,54 @@ public class Player : MonoBehaviour
 
     public void DamagePlayer()
     {
+        if (_isShieldActive)
+        {
+            _isShieldActive = false;
+            _shieldVisuals.SetActive(false);
+            return;
+        }
         _lives--;
 
         if (_lives <= 0)
         {
             _spawnManager.OnPlayerDeath();
             Destroy(this.gameObject);
+        }
+    }
+
+    public void ActivateTripleShot()
+    {
+        _isTripleShot = true;
+        StartCoroutine(PowerupRoutine("Triple_Shot"));
+
+    }
+    public void ActivateSpeedBoost()
+    {
+        _isBonusSpeed = true;
+        StartCoroutine(PowerupRoutine("Speed_Boost"));
+    }
+
+    public void ActivateShields()
+    {
+        _shieldVisuals.SetActive(true);
+        _isShieldActive = true;
+    }
+    IEnumerator PowerupRoutine(string powerup)
+    {
+        yield return new WaitForSeconds(_powerupDuration);
+        switch (powerup)
+        {
+            case "Triple_Shot":
+                _isTripleShot = false;
+                break;
+
+            case "Speed_Boost":
+                _isBonusSpeed = false;
+                break;
+            default:
+                _isTripleShot = false;
+                _isBonusSpeed = false;
+                break;
         }
     }
 }

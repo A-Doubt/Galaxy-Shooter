@@ -10,7 +10,7 @@ public class Enemy : MonoBehaviour
 
     void Start()
     {
-        transform.position = new Vector3(Random.Range(-8, 8), 8f);
+        transform.position = new Vector3(Random.Range(-8.0f, 8.0f), 8.0f);
     }
 
     void Update()
@@ -19,7 +19,7 @@ public class Enemy : MonoBehaviour
 
         if (transform.position.y <= -5.5f)
         {
-            float randomX = Random.Range(-8.0f, 8.0f);
+            float randomX = Random.Range(-10.3f, 9.3f);
             transform.position = new Vector3(randomX, 8f);
         }
     }
