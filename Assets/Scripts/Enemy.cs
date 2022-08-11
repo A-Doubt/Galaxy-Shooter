@@ -8,8 +8,11 @@ public class Enemy : MonoBehaviour
     [SerializeField]
     private float _speed = 4.0f;
 
+    private Player _player;
+
     void Start()
     {
+        _player = GameObject.Find("Player").GetComponent<Player>();
         transform.position = new Vector3(Random.Range(-8.0f, 8.0f), 8.0f);
     }
 
@@ -41,6 +44,7 @@ public class Enemy : MonoBehaviour
         if (other.tag == "Laser")
         {
             Destroy(other.gameObject);
+            if (_player != null) _player.AddScore(1);
             Destroy(this.gameObject);
             return;
         }
