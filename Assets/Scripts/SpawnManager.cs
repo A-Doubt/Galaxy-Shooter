@@ -19,6 +19,11 @@ public class SpawnManager : MonoBehaviour
     private bool _isPlayerAlive = true;
     void Start()
     {
+
+    }
+
+    public void StartSpawning()
+    {
         StartCoroutine(EnemySpawnRoutine());
         StartCoroutine(PowerupSpawnRoutine());
     }
@@ -30,6 +35,7 @@ public class SpawnManager : MonoBehaviour
 
     IEnumerator EnemySpawnRoutine()
     {
+        yield return new WaitForSeconds(3.0f);
         while (_isPlayerAlive == true)
         {
             GameObject newEnemy = Instantiate(_enemyPrefab, new Vector3(0, 10), Quaternion.identity); // make sure it's off the screen.
@@ -40,6 +46,7 @@ public class SpawnManager : MonoBehaviour
 
     IEnumerator PowerupSpawnRoutine()
     {
+        yield return new WaitForSeconds(3.0f);
         while (_isPlayerAlive == true)
         {
             int randomPowerup = Random.Range(0, 3); // This will be changed later!
